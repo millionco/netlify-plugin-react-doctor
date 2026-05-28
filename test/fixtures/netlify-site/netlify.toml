@@ -1,0 +1,11 @@
+[build]
+command = "npm run build"
+publish = "dist"
+
+[[plugins]]
+package = "../../.."
+
+[plugins.inputs]
+fail_on = "none"
+directory = "."
+skip_without_react = false

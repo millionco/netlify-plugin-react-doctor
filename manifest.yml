@@ -1,0 +1,54 @@
+name: netlify-plugin-react-doctor
+inputs:
+  - name: directory
+    required: false
+    default: "."
+    description: Project directory to scan. React Doctor config rootDir can redirect this for monorepos.
+
+  - name: projects
+    required: false
+    description: Optional list of project directories to scan explicitly.
+
+  - name: fail_on
+    required: false
+    default: "error"
+    description: Diagnostic severity that fails the build. One of error, warning, or none.
+
+  - name: skip_without_react
+    required: false
+    default: true
+    description: Skip without failing when no React project is detected.
+
+  - name: lint
+    required: false
+    default: true
+    description: Run React Doctor lint checks.
+
+  - name: dead_code
+    required: false
+    default: true
+    description: Run React Doctor dead-code analysis.
+
+  - name: verbose
+    required: false
+    default: false
+    description: Include more diagnostic detail in the deploy summary.
+
+  - name: no_score
+    required: false
+    default: false
+    description: Skip React Doctor score calculation.
+
+  - name: respect_inline_disables
+    required: false
+    default: true
+    description: Respect inline eslint, oxlint, and react-doctor disable comments.
+
+  - name: max_findings
+    required: false
+    default: 20
+    description: Maximum number of diagnostics shown in the deploy summary details.
+
+  - name: output_path
+    required: false
+    description: Optional path for a JSON report, relative to the repository root.

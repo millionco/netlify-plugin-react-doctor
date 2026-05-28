@@ -1,0 +1,65 @@
+{
+  "name": "netlify-plugin-react-doctor",
+  "version": "0.1.0",
+  "description": "Netlify Build Plugin that runs React Doctor before deploys",
+  "keywords": [
+    "lint",
+    "netlify",
+    "netlify-plugin",
+    "performance",
+    "react",
+    "react-doctor"
+  ],
+  "bugs": {
+    "url": "https://github.com/millionco/netlify-plugin-react-doctor/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/millionco/netlify-plugin-react-doctor.git"
+  },
+  "files": [
+    "dist",
+    "manifest.yml",
+    "README.md"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --sourcemap --clean && tsc -p tsconfig.build.json",
+    "dev": "bun test --watch",
+    "start": "bun src/index.ts",
+    "lint": "oxlint --type-aware",
+    "format": "oxfmt",
+    "test": "vitest run",
+    "typecheck": "tsgo --noEmit"
+  },
+  "dependencies": {
+    "react-doctor": "^0.2.9",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@factory/eslint-plugin": "latest",
+    "@types/bun": "latest",
+    "@types/node": "^25.9.1",
+    "@typescript/native-preview": "^7.0.0-dev.20260510.1",
+    "netlify-cli": "^26.0.2",
+    "oxclippy": "^0.2.0",
+    "oxfmt": "latest",
+    "oxlint": "latest",
+    "oxlint-tsgolint": "latest",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

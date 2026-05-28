@@ -1,0 +1,12 @@
+{
+  "name": "netlify-react-doctor-fixture",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "mkdir -p dist && echo '<main>fixture</main>' > dist/index.html"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
