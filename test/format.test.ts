@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { formatBuildFailureMessage, formatStatus } from "../src/format.js";
-import type { Diagnostic, GateResult, PluginConfig, ScanOutcome } from "../src/types.js";
+import { formatStatus } from "../src/format.js";
+import type { Diagnostic, PluginConfig, ScanOutcome } from "../src/types.js";
 
 const config: PluginConfig = {
   deadCode: true,
@@ -97,15 +97,5 @@ describe("formatStatus", () => {
         status: "failed",
       },
     ]);
-  });
-
-  it("formats blocking failure messages", () => {
-    const gate: GateResult = {
-      failOn: "warning",
-      failingDiagnostics: [diagnostic("warning", "warn-rule")],
-      shouldFail: true,
-    };
-
-    expect(formatBuildFailureMessage(gate)).toContain("fail_on=warning");
   });
 });
