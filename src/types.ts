@@ -59,7 +59,7 @@ export interface GateResult {
 }
 
 export interface StatusPayload {
-  readonly extraData?: unknown;
+  readonly extraData?: unknown[];
   readonly summary: string;
   readonly text?: string;
   readonly title: string;
@@ -72,16 +72,6 @@ export interface NetlifyBuildUtils {
   };
   readonly status?: {
     readonly show?: (payload: StatusPayload) => void;
-  };
-}
-
-export interface ResolvedNetlifyBuildUtils {
-  readonly build: {
-    readonly failBuild: (message: string, options?: { error?: Error }) => void;
-    readonly failPlugin: (message: string, options?: { error?: Error }) => void;
-  };
-  readonly status: {
-    readonly show: (payload: StatusPayload) => void;
   };
 }
 

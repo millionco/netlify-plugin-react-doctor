@@ -3,7 +3,6 @@ import {
   isReactDoctorError,
   summarizeDiagnostics,
   type DiagnoseResult,
-  type Diagnostic,
   type JsonReport,
   type JsonReportProjectEntry,
   type ScoreResult,
@@ -29,18 +28,12 @@ const skippableDiscoveryErrorNames = new Set([
   "PackageJsonNotFoundError",
 ]);
 
-const errorName = (error: unknown): string | null => (error instanceof Error ? error.name : null);
+function isSkippableReactDoctorError(error: unknown): boolean {
+  if (error instanceof Error && skippableDiscoveryErrorNames.has(error.name)) return true;
+  if (!isReactDoctorError(error)) return false;
 
-const reactDoctorReasonTag = (error: unknown): string | null => {
-  if (!isReactDoctorError(error)) return null;
   const reason = error.reason as { _tag?: unknown };
-  return typeof reason._tag === "string" ? reason._tag : null;
-};
-
-export function isSkippableReactDoctorError(error: unknown): boolean {
-  const name = errorName(error);
-  if (name !== null && skippableDiscoveryErrorNames.has(name)) return true;
-  return reactDoctorReasonTag(error) === "NoReactDependency";
+  return reason._tag === "NoReactDependency";
 }
 
 const errorMessage = (error: unknown): string =>
@@ -111,22 +104,6 @@ const skippedOutcome = (skippedProjects: readonly SkippedProject[]): ScanOutcome
   status: "skipped",
 });
 
-const handleProjectError = (
-  project: ProjectResult,
-  config: PluginConfig,
-  skippedProjects: SkippedProject[],
-): void => {
-  if (project.ok) return;
-  if (config.skipWithoutReact && isSkippableReactDoctorError(project.error)) {
-    skippedProjects.push({
-      directory: project.directory,
-      reason: errorMessage(project.error),
-    });
-    return;
-  }
-  throw project.error;
-};
-
 const runSingleProject = async (config: PluginConfig): Promise<ScanOutcome> => {
   try {
     const result = withScorePreference(
@@ -165,8 +142,17 @@ const runMultipleProjects = async (config: PluginConfig): Promise<ScanOutcome> =
   const entries: JsonReportProjectEntry[] = [];
 
   for (const project of results) {
-    handleProjectError(project, config, skippedProjects);
-    if (!project.ok) continue;
+    if (!project.ok) {
+      if (!config.skipWithoutReact || !isSkippableReactDoctorError(project.error)) {
+        throw project.error;
+      }
+      skippedProjects.push({
+        directory: project.directory,
+        reason: errorMessage(project.error),
+      });
+      continue;
+    }
+
     const projectResult = withScorePreference(project.result, config.noScore);
     entries.push(toProjectEntry(projectResult.project.rootDirectory, projectResult));
   }
@@ -176,7 +162,7 @@ const runMultipleProjects = async (config: PluginConfig): Promise<ScanOutcome> =
   const report = buildReport(config.directory, entries, performance.now() - startTime);
 
   return {
-    diagnostics: report.diagnostics as readonly Diagnostic[],
+    diagnostics: report.diagnostics,
     report,
     skippedProjects,
     status: "completed",

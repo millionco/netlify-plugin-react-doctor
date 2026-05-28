@@ -106,29 +106,6 @@ const buildCompletedText = (
   return lines.join("\n");
 };
 
-const completedExtraData = (
-  report: JsonReport,
-  outcome: ScanOutcome,
-  gate: GateResult,
-  config: PluginConfig,
-): unknown[] => [
-  {
-    diagnostics: [...report.diagnostics].sort(bySeverityAndLocation).slice(0, config.maxFindings),
-    failOn: gate.failOn,
-    projects: report.projects.map((project) => ({
-      directory: project.directory,
-      framework: project.project.framework,
-      name: project.project.projectName,
-      score: project.score,
-      skippedChecks: project.skippedChecks,
-      sourceFileCount: project.project.sourceFileCount,
-    })),
-    skippedProjects: outcome.skippedProjects,
-    status: gate.shouldFail ? "failed" : "passed",
-    summary: report.summary,
-  },
-];
-
 export function formatStatus(
   outcome: ScanOutcome,
   gate: GateResult,
@@ -150,15 +127,27 @@ export function formatStatus(
   )}`;
 
   return {
-    extraData: completedExtraData(report, outcome, gate, config),
+    extraData: [
+      {
+        diagnostics: [...report.diagnostics]
+          .sort(bySeverityAndLocation)
+          .slice(0, config.maxFindings),
+        failOn: gate.failOn,
+        projects: report.projects.map((project) => ({
+          directory: project.directory,
+          framework: project.project.framework,
+          name: project.project.projectName,
+          score: project.score,
+          skippedChecks: project.skippedChecks,
+          sourceFileCount: project.project.sourceFileCount,
+        })),
+        skippedProjects: outcome.skippedProjects,
+        status,
+        summary: report.summary,
+      },
+    ],
     summary,
     text: buildCompletedText(report, outcome, config),
     title: "React Doctor",
   };
-}
-
-export function formatBuildFailureMessage(gate: GateResult): string {
-  const count = gate.failingDiagnostics.length;
-  const threshold = gate.failOn === "warning" ? "warnings or errors" : `${gate.failOn} diagnostics`;
-  return `React Doctor found ${plural(count, "blocking diagnostic")} matching fail_on=${gate.failOn} (${threshold}).`;
 }
